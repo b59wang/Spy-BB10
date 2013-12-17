@@ -28,12 +28,8 @@ TabbedPane {
         // Localized text with the dynamic translation and locale updates support
         title: qsTr("游戏") + Retranslate.onLocaleOrLanguageChanged
         imageSource: "asset:///images/icons/game.png"
-        Page {
-            Container {
-                Label {
-                    text: qsTr("游戏") + Retranslate.onLocaleOrLanguageChanged
-                }
-            }
+        GameTab {
+            
         }
     } //End of first tab
     Tab { //Second tab
