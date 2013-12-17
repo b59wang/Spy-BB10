@@ -58,6 +58,7 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 
 	// Set m_tabPanel = 0;
 	m_tabPanel = 0;
+	qml->setContextProperty("_App", this);
 
 	// Set created root object as the application scene
 	app->setScene(root);
@@ -80,33 +81,57 @@ void ApplicationUI::setPane(TabbedPane* pane) {
 void ApplicationUI::setNameListView() {
 	qDebug() << "here" << endl;
 
-	bb::cascades::ListView* pNameListView = QCoreApplication::instance()->findChild<
-			bb::cascades::ListView*>("nameListViewQML");
+	bb::cascades::ListView* pNameListView =
+			QCoreApplication::instance()->findChild<bb::cascades::ListView*>(
+					"nameListViewQML");
 
-	bb::cascades::DropDown* pPlayersDropDown = QCoreApplication::instance()->findChild<
-			bb::cascades::DropDown*>("playerDropDownQML");
+	bb::cascades::DropDown* pPlayersDropDown =
+			QCoreApplication::instance()->findChild<bb::cascades::DropDown*>(
+					"playerDropDownQML");
 
-	bb::cascades::DropDown* pSpiesDropDown = QCoreApplication::instance()->findChild<
-			bb::cascades::DropDown*>("spyDropDownQML");
+	bb::cascades::DropDown* pSpiesDropDown =
+			QCoreApplication::instance()->findChild<bb::cascades::DropDown*>(
+					"spyDropDownQML");
 
-	bb::cascades::DropDown* pBlanksDropDown = QCoreApplication::instance()->findChild<
-			bb::cascades::DropDown*>("whiteDropDownQML");
+	bb::cascades::DropDown* pBlanksDropDown =
+			QCoreApplication::instance()->findChild<bb::cascades::DropDown*>(
+					"whiteDropDownQML");
 
-	if (pNameListView && pPlayersDropDown && pSpiesDropDown &&  pBlanksDropDown){
+	if (pNameListView && pPlayersDropDown && pSpiesDropDown
+			&& pBlanksDropDown) {
 		int iNumPlayers = pPlayersDropDown->selectedIndex() + 5;
 		int iNumSpies = pSpiesDropDown->selectedIndex() + 1;
 		int iNumBlanks = pBlanksDropDown->selectedIndex() + 1;
 		qDebug() << iNumPlayers << iNumSpies << iNumBlanks << endl;
 
-		bb::cascades::ArrayDataModel* pDataModel = (bb::cascades::ArrayDataModel*) pNameListView->dataModel();
+		bb::cascades::ArrayDataModel* pDataModel =
+				(bb::cascades::ArrayDataModel*) pNameListView->dataModel();
 
-		QMap <QString, QVariant> mapPlayerInfo;
-		for (int i = 0; i < iNumPlayers ; i++){
-			QVariant qPlayerName("Player" + QString::number(i+1));
+		QMap<QString, QVariant> mapPlayerInfo;
+		for (int i = 0; i < iNumPlayers; i++) {
+			QVariant qPlayerName("Player" + QString::number(i + 1));
 			QVariant qPlayerRole("Normal");
+			QVariant qPlayerIndex(i);
 			mapPlayerInfo["name"] = qPlayerName;
 			mapPlayerInfo["role"] = qPlayerRole;
+			mapPlayerInfo["index"] = qPlayerIndex;
 			pDataModel->append(mapPlayerInfo);
 		}
 	}
+}
+
+void ApplicationUI::changeName(int index, QString name) {
+
+	bb::cascades::ListView* pNameListView =
+			QCoreApplication::instance()->findChild<bb::cascades::ListView*>(
+					"nameListViewQML");
+
+	bb::cascades::ArrayDataModel* pDataModel =
+			(bb::cascades::ArrayDataModel*) pNameListView->dataModel();
+
+	QMap<QString, QVariant> mapTempMap = pDataModel->value(index).toMap();
+	mapTempMap["name"] = name;
+
+	pDataModel->removeAt(index);
+	pDataModel->insert(index, QVariant(mapTempMap));
 }

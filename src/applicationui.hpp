@@ -57,6 +57,8 @@ public:
 	void setPane(bb::cascades::TabbedPane* pane);
 	Q_INVOKABLE
 	void setNameListView();
+	Q_INVOKABLE
+	void changeName(int index, QString name);
 };
 
 #endif /* ApplicationUI_HPP_ */
