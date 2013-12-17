@@ -1,8 +1,9 @@
 1
-7
+8
 images/banner.png
 images/icons/game.png
 images/icons/setting.png
+images/spy.png
 main.qml
 SettingMainPage.qml
 SettingNames.qml

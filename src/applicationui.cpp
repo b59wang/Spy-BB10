@@ -101,10 +101,6 @@ void ApplicationUI::setNameListView() {
 		bb::cascades::ArrayDataModel* pDataModel = (bb::cascades::ArrayDataModel*) pNameListView->dataModel();
 
 
-		for (int i = 0; i < iNumPlayers ; i++){
-
-		}
-
 		pDataModel->append()
 
 		QVariant val = pDataModel->value(0);
