@@ -39,11 +39,22 @@ Page {
             ListView {
                 id: nameListView
                 objectName: "nameListViewQML"
+                dataModel: ArrayDataModel {
+                    id: theDataModel
+                }
+                
+                onCreationCompleted: {
+                    theDataModel.append({
+                            "name": "asdf",
+                            "asd" : "asd"
+                    });
+                }
+                
                 listItemComponents: [
                     ListItemComponent {
                         StandardListItem {
-                            title: ListItem.name
-                            imageSource: "asset:///images/icons/game.png"
+                            title:  ListItemData.name
+                            imageSource: "asset:///images/spy.png"
                         }
                     }
                 ]

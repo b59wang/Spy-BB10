@@ -78,22 +78,39 @@ void ApplicationUI::setPane(TabbedPane* pane) {
 }
 
 void ApplicationUI::setNameListView() {
-	bb::cascades::ListView* pNameListView = m_tabPanel->findChild<
+	qDebug() << "here" << endl;
+
+	bb::cascades::ListView* pNameListView = QCoreApplication::instance()->findChild<
 			bb::cascades::ListView*>("nameListViewQML");
 
-	bb::cascades::DropDown* pPlayersDropDown = m_tabPanel->findChild<
+	bb::cascades::DropDown* pPlayersDropDown = QCoreApplication::instance()->findChild<
 			bb::cascades::DropDown*>("playerDropDownQML");
 
-	bb::cascades::DropDown* pSpiesDropDown = m_tabPanel->findChild<
+	bb::cascades::DropDown* pSpiesDropDown = QCoreApplication::instance()->findChild<
 			bb::cascades::DropDown*>("spyDropDownQML");
 
-	bb::cascades::DropDown* pBlanksDropDown = m_tabPanel->findChild<
+	bb::cascades::DropDown* pBlanksDropDown = QCoreApplication::instance()->findChild<
 			bb::cascades::DropDown*>("whiteDropDownQML");
 
 	if (pNameListView && pPlayersDropDown && pSpiesDropDown &&  pBlanksDropDown){
-		int iNumPlayers = pPlayersDropDown->selectedIndex();
-		int iNumSpies = pSpiesDropDown->selectedIndex();
-		int iNumBlanks = pBlanksDropDown->selectedIndex();
+		int iNumPlayers = pPlayersDropDown->selectedIndex() + 5;
+		int iNumSpies = pSpiesDropDown->selectedIndex() + 1;
+		int iNumBlanks = pBlanksDropDown->selectedIndex() + 1;
 		qDebug() << iNumPlayers << iNumSpies << iNumBlanks << endl;
+
+		bb::cascades::ArrayDataModel* pDataModel = (bb::cascades::ArrayDataModel*) pNameListView->dataModel();
+
+
+		for (int i = 0; i < iNumPlayers ; i++){
+
+		}
+
+		pDataModel->append()
+
+		QVariant val = pDataModel->value(0);
+
+		qDebug() << val.toMap().value("name").toString() << endl;
+
+
 	}
 }
