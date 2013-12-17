@@ -18,6 +18,7 @@
 #define ApplicationUI_HPP_
 
 #include <QObject>
+#include <QMetaType>
 #include <bb/cascades/AbstractPane>
 #include <bb/cascades/TabbedPane>
 
@@ -36,6 +37,7 @@ class QTranslator;
  *
  *
  */
+
 
 class ApplicationUI: public QObject {
 	Q_OBJECT

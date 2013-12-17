@@ -100,13 +100,13 @@ void ApplicationUI::setNameListView() {
 
 		bb::cascades::ArrayDataModel* pDataModel = (bb::cascades::ArrayDataModel*) pNameListView->dataModel();
 
-
-		pDataModel->append()
-
-		QVariant val = pDataModel->value(0);
-
-		qDebug() << val.toMap().value("name").toString() << endl;
-
-
+		QMap <QString, QVariant> mapPlayerInfo;
+		for (int i = 0; i < iNumPlayers ; i++){
+			QVariant qPlayerName("Player" + QString::number(i+1));
+			QVariant qPlayerRole("Normal");
+			mapPlayerInfo["name"] = qPlayerName;
+			mapPlayerInfo["role"] = qPlayerRole;
+			pDataModel->append(mapPlayerInfo);
+		}
 	}
 }

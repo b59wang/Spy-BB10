@@ -43,13 +43,6 @@ Page {
                     id: theDataModel
                 }
                 
-                onCreationCompleted: {
-                    theDataModel.append({
-                            "name": "asdf",
-                            "asd" : "asd"
-                    });
-                }
-                
                 listItemComponents: [
                     ListItemComponent {
                         StandardListItem {
