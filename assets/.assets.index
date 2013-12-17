@@ -1,0 +1,9 @@
+1
+7
+images/banner.png
+images/icons/game.png
+images/icons/setting.png
+main.qml
+SettingMainPage.qml
+SettingNames.qml
+SettingTab.qml
