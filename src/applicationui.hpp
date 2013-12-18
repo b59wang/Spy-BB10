@@ -22,6 +22,7 @@
 #include <bb/cascades/AbstractPane>
 #include <bb/cascades/TabbedPane>
 #include <bb/cascades/ArrayDataModel>
+#include <QList>
 
 namespace bb {
 namespace cascades {
@@ -40,7 +41,6 @@ class QTranslator;
  *
  */
 
-
 class ApplicationUI: public QObject {
 	Q_OBJECT
 public:
@@ -54,6 +54,10 @@ private:
 	bb::cascades::LocaleHandler* m_pLocaleHandler;
 	bb::cascades::TabbedPane* m_tabPanel;
 	bb::cascades::ArrayDataModel* m_arrayModel;
+	QList<QString>* m_wordList;
+	int m_numAlive;
+	int m_numSpyAlive;
+	int m_numWhiteAlive;
 
 public:
 	Q_INVOKABLE
@@ -62,6 +66,14 @@ public:
 	void setNameListView();
 	Q_INVOKABLE
 	void changeName(int index, QString name);
+	Q_INVOKABLE
+	void elimateSetup();
+	Q_INVOKABLE
+	QString elimate(int iSelectedIndex);
+	Q_INVOKABLE
+	void gameSetup();
+	int randInt(int low, int high);
+	void grabWords();
 };
 
 #endif /* ApplicationUI_HPP_ */

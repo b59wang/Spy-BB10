@@ -25,6 +25,9 @@
 #include <bb/cascades/ArrayDataModel>
 #include <bb/cascades/DropDown>
 #include <QString>
+#include <QGlobal.h>
+#include <QTime>
+#include <QFile>
 
 using namespace bb::cascades;
 
@@ -54,11 +57,18 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 	qml->setContextProperty("_App", this);
 
 	// Create root object for the UI
+	QTime time = QTime::currentTime();
+	qsrand((uint) time.msec());
 	AbstractPane *root = qml->createRootObject<AbstractPane>();
 
 	// Set m_tabPanel = 0;
+	m_numAlive = 0;
+	m_numSpyAlive = 0;
+	m_numWhiteAlive = 0;
 	m_tabPanel = 0;
 	m_arrayModel = 0;
+	m_wordList = new QList<QString>();
+	grabWords();
 
 	// Set created root object as the application scene
 	app->setScene(root);
@@ -116,18 +126,19 @@ void ApplicationUI::setNameListView() {
 		} else {
 			QMap<QString, QVariant> mapPlayerInfo;
 			for (int i = iOldSize; i < iNumPlayers; i++) {
-				QVariant qPlayerName("Player" + QString::number(i + 1));
-				QVariant qPlayerRole("Normal");
+				QVariant qPlayerName(QString::fromUtf8("玩家") + QString::number(i + 1));
+				QVariant qPlayerRole("normal");
 				QVariant qPlayerIndex(i);
+				QVariant qPlayerStatus(true);
 				mapPlayerInfo["name"] = qPlayerName;
 				mapPlayerInfo["role"] = qPlayerRole;
 				mapPlayerInfo["index"] = qPlayerIndex;
+				mapPlayerInfo["alive"] = qPlayerStatus;
 				pDataModel->append(mapPlayerInfo);
 			}
 		}
 
 		m_arrayModel = pDataModel;
-
 	}
 }
 
@@ -145,4 +156,153 @@ void ApplicationUI::changeName(int index, QString name) {
 
 	pDataModel->removeAt(index);
 	pDataModel->insert(index, QVariant(mapTempMap));
+}
+
+void ApplicationUI::grabWords() {
+	QFile textfile("app/native/assets/words/words.txt");
+
+	if (textfile.exists()
+			&& textfile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		QTextStream stream(&textfile);
+		QString line;
+		do {
+			line = stream.readLine();
+			if (line != "") {
+				m_wordList->append(line);
+			}
+		} while (!line.isNull());
+	} else {
+		qDebug() << "No file ERROR!";
+	}
+	textfile.close();
+}
+
+void ApplicationUI::gameSetup() {
+	QTime time = QTime::currentTime();
+		qsrand((uint) time.msec());
+
+	bb::cascades::ListView* pGameListView =
+			QCoreApplication::instance()->findChild<bb::cascades::ListView*>(
+					"gameRoleListViewQML");
+
+	bb::cascades::DropDown* pPlayersDropDown =
+			QCoreApplication::instance()->findChild<bb::cascades::DropDown*>(
+					"playerDropDownQML");
+
+	bb::cascades::DropDown* pSpiesDropDown =
+			QCoreApplication::instance()->findChild<bb::cascades::DropDown*>(
+					"spyDropDownQML");
+
+	bb::cascades::DropDown* pBlanksDropDown =
+			QCoreApplication::instance()->findChild<bb::cascades::DropDown*>(
+					"whiteDropDownQML");
+
+	if (pGameListView && pPlayersDropDown && pSpiesDropDown
+			&& pBlanksDropDown) {
+		int iNumPlayers = pPlayersDropDown->selectedIndex() + 5;
+		int iNumSpies = pSpiesDropDown->selectedIndex() + 1;
+		int iNumBlanks = pBlanksDropDown->selectedIndex() + 1;
+		qDebug() << iNumPlayers << iNumSpies << iNumBlanks << endl;
+
+		setNameListView();
+
+		int iRandom = randInt(0, m_wordList->size() - 1);
+		QStringList sRandomedWord = m_wordList->at(iRandom).split(",");
+		QString sWordOne = sRandomedWord.at(0);
+		QString sWordTwo = sRandomedWord.at(1);
+
+		int arrRandomInt[iNumPlayers];
+		for (int i = 0; i < iNumPlayers; i++) {
+			arrRandomInt[i] = i;
+		}
+
+		m_numAlive = iNumPlayers;
+		for (int i = 0; i < iNumPlayers; i++) {
+			int iRandom = randInt(0, iNumPlayers - 1);
+			int iTemp = arrRandomInt[iRandom];
+			arrRandomInt[iRandom] = arrRandomInt[i];
+			arrRandomInt[i] = iTemp;
+
+			QMap<QString, QVariant> mapPlayerInfo =
+					m_arrayModel->value(i).toMap();
+			mapPlayerInfo["role"] = QVariant("normal");
+			mapPlayerInfo["alive"] = QVariant(true);
+			mapPlayerInfo["word"] = QVariant(sWordOne);
+			m_arrayModel->replace(i, mapPlayerInfo);
+		}
+
+		m_numSpyAlive = iNumSpies;
+		for (int i = 0; i < iNumSpies; i++) {
+			QMap<QString, QVariant> mapPlayerInfo = m_arrayModel->value(
+					arrRandomInt[i]).toMap();
+			mapPlayerInfo["role"] = QVariant("spy");
+			mapPlayerInfo["alive"] = QVariant(true);
+			mapPlayerInfo["word"] = QVariant(sWordTwo);
+			m_arrayModel->replace(arrRandomInt[i], mapPlayerInfo);
+		}
+
+		m_numWhiteAlive = iNumBlanks;
+		for (int i = iNumSpies; i < iNumSpies + iNumBlanks; i++) {
+			QMap<QString, QVariant> mapPlayerInfo = m_arrayModel->value(
+					arrRandomInt[i]).toMap();
+			mapPlayerInfo["role"] = QVariant("white");
+			mapPlayerInfo["alive"] = QVariant(true);
+			mapPlayerInfo["word"] = QVariant(QString::fromUtf8("[白][板]"));
+			m_arrayModel->replace(arrRandomInt[i], mapPlayerInfo);
+		}
+
+		pGameListView->setDataModel(m_arrayModel);
+	}
+}
+
+int ApplicationUI::randInt(int low, int high) {
+	// Random number between low and high
+	return qrand() % ((high + 1) - low) + low;
+}
+
+void ApplicationUI::elimateSetup() {
+	bb::cascades::ListView* pGameListView =
+			QCoreApplication::instance()->findChild<bb::cascades::ListView*>(
+					"gameListViewQML");
+	if (pGameListView) {
+		pGameListView->setDataModel(m_arrayModel);
+		pGameListView->setEnabled(true);
+	}
+}
+
+QString ApplicationUI::elimate(int iSelectedIndex) {
+	qDebug() << "elimate " <<  iSelectedIndex << " alive: " << m_numAlive << m_numSpyAlive << m_numWhiteAlive << endl;
+
+	QString sResult = "";
+	QMap<QString, QVariant> mapPlayerInfo =
+			m_arrayModel->value(iSelectedIndex).toMap();
+
+	mapPlayerInfo["alive"] = QVariant(false);
+	QVariant temp = mapPlayerInfo["role"];
+
+	m_numAlive--;
+	if (temp.toString() == "spy") {
+		m_numSpyAlive--;
+	} else if (temp.toString() == "white"){
+		m_numWhiteAlive--;
+	}
+	m_arrayModel->replace(iSelectedIndex, mapPlayerInfo);
+
+	if(m_numSpyAlive == 0 && m_numWhiteAlive == 0){
+		sResult = QString::fromUtf8("平民获胜");
+	} else if(m_numAlive == 2){
+		if (m_numSpyAlive == 0) {
+			sResult = QString::fromUtf8("白板获胜");
+		} else if (m_numWhiteAlive == 0){
+			sResult = QString::fromUtf8("间谍获胜");
+		} else {
+			sResult = QString::fromUtf8("白板和间谍获胜");
+		}
+	} else if (m_numSpyAlive > (m_numAlive - m_numSpyAlive -  m_numWhiteAlive) && m_numWhiteAlive == 0){
+		sResult = QString::fromUtf8("间谍获胜");
+	} else if (m_numWhiteAlive > (m_numAlive - m_numSpyAlive -  m_numWhiteAlive) && m_numSpyAlive == 0){
+		sResult = QString::fromUtf8("白板获胜");
+	}
+
+	return sResult;
 }

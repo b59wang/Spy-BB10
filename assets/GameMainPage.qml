@@ -37,6 +37,10 @@ Page {
                         horizontalAlignment: HorizontalAlignment.Center
                         preferredHeight: 300
                         defaultImageSource: "asset:///images/button.png"
+                        onClicked: {
+                            _App.gameSetup();
+                            gameNAV.push(gameRolePage)
+                        }
                     }
                     
                     Divider {
