@@ -147,6 +147,18 @@ Page {
                         settingNAV.push(settingNamePage);
                     }
                 }
+                
+                Divider {
+                    
+                }
+                
+                Label {
+                    horizontalAlignment: HorizontalAlignment.Center
+                    text: "Thanks for downloading this APP!
+                    
+https://github.com/b59wang/Spy-BB10 "  
+                    multiline: true
+                }
             }
         }
     }

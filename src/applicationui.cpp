@@ -58,7 +58,7 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 
 	// Set m_tabPanel = 0;
 	m_tabPanel = 0;
-	qml->setContextProperty("_App", this);
+	m_arrayModel = 0;
 
 	// Set created root object as the application scene
 	app->setScene(root);
@@ -107,16 +107,27 @@ void ApplicationUI::setNameListView() {
 		bb::cascades::ArrayDataModel* pDataModel =
 				(bb::cascades::ArrayDataModel*) pNameListView->dataModel();
 
-		QMap<QString, QVariant> mapPlayerInfo;
-		for (int i = 0; i < iNumPlayers; i++) {
-			QVariant qPlayerName("Player" + QString::number(i + 1));
-			QVariant qPlayerRole("Normal");
-			QVariant qPlayerIndex(i);
-			mapPlayerInfo["name"] = qPlayerName;
-			mapPlayerInfo["role"] = qPlayerRole;
-			mapPlayerInfo["index"] = qPlayerIndex;
-			pDataModel->append(mapPlayerInfo);
+		int iOldSize = pDataModel->size();
+
+		if (iNumPlayers < iOldSize) {
+			for (int i = iOldSize - 1; i >= iNumPlayers; i--) {
+				pDataModel->removeAt(i);
+			}
+		} else {
+			QMap<QString, QVariant> mapPlayerInfo;
+			for (int i = iOldSize; i < iNumPlayers; i++) {
+				QVariant qPlayerName("Player" + QString::number(i + 1));
+				QVariant qPlayerRole("Normal");
+				QVariant qPlayerIndex(i);
+				mapPlayerInfo["name"] = qPlayerName;
+				mapPlayerInfo["role"] = qPlayerRole;
+				mapPlayerInfo["index"] = qPlayerIndex;
+				pDataModel->append(mapPlayerInfo);
+			}
 		}
+
+		m_arrayModel = pDataModel;
+
 	}
 }
 

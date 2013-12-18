@@ -21,12 +21,14 @@
 #include <QMetaType>
 #include <bb/cascades/AbstractPane>
 #include <bb/cascades/TabbedPane>
+#include <bb/cascades/ArrayDataModel>
 
 namespace bb {
 namespace cascades {
 class Application;
 class LocaleHandler;
 class TabbedPane;
+class ArrayDataModel;
 }
 }
 
@@ -51,6 +53,7 @@ private:
 	QTranslator* m_pTranslator;
 	bb::cascades::LocaleHandler* m_pLocaleHandler;
 	bb::cascades::TabbedPane* m_tabPanel;
+	bb::cascades::ArrayDataModel* m_arrayModel;
 
 public:
 	Q_INVOKABLE

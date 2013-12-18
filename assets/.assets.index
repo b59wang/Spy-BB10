@@ -1,6 +1,7 @@
 1
-10
+11
 GameMainPage.qml
+GameTab.qml
 images/banner.png
 images/button.png
 images/icons/game.png
